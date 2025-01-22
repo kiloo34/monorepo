@@ -1,0 +1,30 @@
+{
+  "name": "backend-repo",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/app.js",
+    "start": "node src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/kiloo34/backend-repo.git"
+  },
+  "author": "kiloo34",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kiloo34/backend-repo/issues"
+  },
+  "homepage": "https://github.com/kiloo34/backend-repo#readme",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.2.0",
+    "firebase-admin": "^13.0.2",
+    "punycode": "^2.3.1",
+    "@my-app/entities": "*"
+  }
+}
