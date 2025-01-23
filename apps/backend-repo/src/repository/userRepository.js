@@ -37,6 +37,7 @@ export const findById = async (id) => {
 export const create = async (userData) => {
     try {
         const newUserRef = doc(collection(db, COLLECTION_NAME));
+        console.log('create', userData);
         await setDoc(newUserRef, userData);
         return {
             id: newUserRef.id,
