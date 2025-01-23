@@ -9,6 +9,6 @@ router.post('/', authMiddleware, createUser);
 router.put('/:id', authMiddleware, updateUser);
 router.delete('/:id', authMiddleware, deleteUser);
 
-router.get('/', getAllUsers);
+router.get('/', authMiddleware, getAllUsers);
 
 export default router;

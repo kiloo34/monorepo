@@ -1,4 +1,4 @@
-import { getAuth } from 'firebase-admin/auth';
+import { getAuth } from '../config/firebaseAdmin.js';
 
 const authMiddleware = async (req, res, next) => {
     try {
@@ -10,8 +10,10 @@ const authMiddleware = async (req, res, next) => {
 
         const decodedToken = await getAuth().verifyIdToken(token);
         req.user = decodedToken;
+
         next();
     } catch (error) {
+        console.error('Token verification failed:', error);
         res.status(401).json({ error: 'Invalid token' });
     }
 };

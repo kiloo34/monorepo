@@ -26,11 +26,9 @@ const LoginPage = () => {
             const userCredential = await signInWithEmailAndPassword(auth, username, password);
             const user = userCredential.user;
 
-            localStorage.setItem('user', JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-            }));
+            const authToken = await user.getIdToken();
+
+            localStorage.setItem('authToken', authToken);
 
             router.push('/dashboard');
         } catch (error) {

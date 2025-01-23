@@ -24,8 +24,8 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
     try {
-        const user = await userRepository.create(req.body);
-        res.status(201).json(user);
+        const response = await userRepository.create(req.body);
+        res.status(201).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Failed to create user' });
     }
@@ -33,8 +33,10 @@ export const createUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
-        const user = await userRepository.update(req.params.id, req.body);
-        res.json(user);
+        const { user } = req.body;
+        const userData = user ? { ...user } : req.body;
+        const userUpdated = await userRepository.update(req.params.id, userData);
+        res.json(userUpdated);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update user' });
     }

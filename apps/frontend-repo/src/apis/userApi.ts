@@ -1,4 +1,3 @@
-// apis/userApi.ts
 import apiClient from '@/apis/apiClient';
 import { User } from '@my-app/entities';
 
@@ -13,7 +12,11 @@ export const getUserById = async (id: string): Promise<User> => {
 };
 
 export const createUser = async (user: Partial<User>): Promise<User> => {
-    const response = await apiClient.post('/users', user);
+    console.log('createUser');
+    console.log(user.user);
+    const response = await apiClient.post('/users', user.user);
+    console.log('response');
+    console.log(response);
     return response.data;
 };
 

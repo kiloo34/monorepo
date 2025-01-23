@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, CircularProgress } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface EntityDialogProps<T> {
     open: boolean;
@@ -12,6 +14,8 @@ interface EntityDialogProps<T> {
         type: 'text' | 'number' | 'email';
         readonly?: boolean;
     }>;
+    loading: boolean;
+    validationSchema: any;
 }
 
 const EntityDialog = <T extends object>({
@@ -20,55 +24,76 @@ const EntityDialog = <T extends object>({
     onSave,
     entity,
     fields,
+    loading,
+    validationSchema,
 }: EntityDialogProps<T>) => {
-    const [entityData, setEntityData] = useState<T | null>(null);
-
-    console.log(fields);
+    const {
+        control,
+        handleSubmit,
+        setValue,
+        reset,
+        formState: { errors },
+    } = useForm<T>({
+        resolver: yupResolver(validationSchema),
+    });
 
     useEffect(() => {
         if (entity) {
-            setEntityData(entity);
+            fields.forEach((field) => {
+                if (entity[field.name] !== undefined) {
+                    setValue(field.name, entity[field.name] as any);
+                }
+            });
+        } else {
+            reset();
         }
-    }, [entity]);
+    }, [entity, fields, setValue, reset]);
 
-    const handleChange = (field: keyof T, value: string) => {
-        if (entityData) {
-            setEntityData({ ...entityData, [field]: value });
-        }
-    };
 
-    const handleSave = () => {
-        if (entityData) {
-            onSave(entityData);
+    useEffect(() => {
+        if (!open) {
+            reset();
         }
+    }, [open, reset]);
+
+    const handleSave = (data: T) => {
+        onSave(data);
     };
 
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>{entity ? 'Edit Entity' : 'Add Entity'}</DialogTitle>
             <DialogContent>
-                {entityData &&
-                    fields.map((field) => {
-                        console.log(field.readonly);
-                        return (
+                {fields.map((field) => (
+                    <Controller
+                        key={String(field.name)}
+                        name={field.name as string}
+                        control={control}
+                        defaultValue={entity ? entity[field.name] : ''}
+                        render={({ field: controllerField }) => (
                             <TextField
-                                key={field.name as string}
-                                label={field.label}
-                                type={field.type}
-                                value={entityData[field.name] as any}
-                                onChange={(e) => handleChange(field.name, e.target.value)}
+                                {...controllerField}
+                                label={fields.find((f) => f.name === controllerField.name)?.label || 'Unnamed Field'}
+                                type={fields.find((f) => f.name === controllerField.name)?.type || 'text'}
                                 fullWidth
                                 margin="normal"
                                 inputProps={{
-                                    readOnly: field.readonly || false,
+                                    readOnly: fields.find((f) => f.name === controllerField.name)?.readonly || false,
                                 }}
+                                error={!!errors[controllerField.name]}
+                                helperText={errors[controllerField.name]?.message}
                             />
-                        )
-                    })}
+                        )}
+                    />
+                ))}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="secondary">Cancel</Button>
-                <Button onClick={handleSave} color="primary">Save</Button>
+                <Button onClick={onClose} color="secondary" disabled={loading}>
+                    {loading ? 'Loading...' : 'Cancel'}
+                </Button>
+                <Button onClick={handleSubmit(handleSave)} color="primary" disabled={loading}>
+                    {loading ? <CircularProgress size={24} /> : 'Save'}
+                </Button>
             </DialogActions>
         </Dialog>
     );
